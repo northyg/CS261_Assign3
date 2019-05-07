@@ -1,11 +1,11 @@
 /***********************************************************
-* Author: 
-* Email: 
-* Date Created: 
+* Author: Giselle Northy
+* Email: northyg@oregonstate.edu
+* Date Created: 5/5/2019
 * Filename: stack_from_queue.c
 *
 * Overview:
-*   This program is an implementation of a stack using two 
+*   This program is an implementation of a stack using two
 *	instances of a queue. The stack functions worked on from
 *	Worksheet 17 were re-implemented using the queue functions
 *	worked on from Worksheet 18. The main used for testing is
@@ -21,10 +21,10 @@
 *		- removing the front link (pop)
 *		- getting the value of the front link (top)
 *		- checking if the stack is empty
-*	The criticial piece to utilizing two queues to implement a 
+*	The criticial piece to utilizing two queues to implement a
 *	stack involve using the second queue to properly dequeue
-*	the first queue's links when performing a push operation 
-*	and swapping the first and second queues so the first 
+*	the first queue's links when performing a push operation
+*	and swapping the first and second queues so the first
 *	always represents the actual 'stack'. This makes this op
 *	expensive, but then top and pop are easy/efficient ops
 *	given that the queue ADT has O(1) access to the front.
@@ -36,7 +36,7 @@
 *
 * Usage:
 * 	1) gcc -g Wall -std=c99 -o stack_from_queue stack_from_queue
-*	2) ./stack_from_queue 
+*	2) ./stack_from_queue
 ************************************************************/
 #include <assert.h>
 #include <stdlib.h>
@@ -74,9 +74,15 @@ struct Stack {
 			head points to sentinel (always)
 			tail points to sentinel (always point to last link unless empty)
  */
-void listQueueInit(struct Queue* queue) 
+void listQueueInit(struct Queue* queue)
 {
 	/* FIXME: You will write this function */
+	assert(queue !=0);
+	struct Link* link = malloc(sizeof(struct Link));
+	assert(link !=0);
+	link->next = 0;
+	queue->head = link;
+	queue->tail = link;
 
 }
 
@@ -87,10 +93,14 @@ void listQueueInit(struct Queue* queue)
 			queue init (call to _initQueue func)
 	return: queue
  */
-struct Queue* listQueueCreate() 
+struct Queue* listQueueCreate()
 {
-	
+
      /* FIXME: You will write this function */
+		 struct Queue* ptr = malloc(sizeof(struct Queue));
+		 assert(ptr !=0);
+		 listQueueInit(ptr);
+		 return ptr;
 }
 
 /**
@@ -98,12 +108,18 @@ struct Queue* listQueueCreate()
 	param: 	queue 	struct Queue ptr
 	param: 	value 	TYPE
 	pre: 	queue is not null
-	post: 	link is created with given value 
+	post: 	link is created with given value
 			link is added after the current last link (pointed to by queue tail)
  */
-void listQueueAddBack (struct Queue* queue, TYPE value) 
+void listQueueAddBack (struct Queue* queue, TYPE value)
 {
 	/* FIXME: You will write this function */
+	assert(queue !=0);
+	struct Link* ptr = malloc(sizeof(struct Link));
+	ptr->value = value;
+	ptr->next = 0;
+	queue->tail->next=ptr;
+	queue->tail=ptr;
 
 }
 
@@ -113,12 +129,15 @@ void listQueueAddBack (struct Queue* queue, TYPE value)
 	pre:	queue is not null
 	pre:	queue is not empty (i.e., queue's head next pointer is not null)
 	post:	none
-	ret:	first link's value 
+	ret:	first link's value
  */
-TYPE listQueueFront(struct Queue* queue) 
+TYPE listQueueFront(struct Queue* queue)
 {
 
    /* FIXME: You will write this function */
+	 assert(queue !=0);
+	 assert(queue->head->next !=0);
+	 return queue->head->next->value;
 
 }
 
@@ -130,10 +149,16 @@ TYPE listQueueFront(struct Queue* queue)
 	pre:	queue is not empty (i.e., queue's head next pointer is not null)
 	post:	first link is removed and freed (call to removeLink)
  */
-TYPE listQueueRemoveFront(struct Queue* queue) 
+TYPE listQueueRemoveFront(struct Queue* queue)
 {
 	/* FIXME: You will write this function */
-
+	assert(queue !=0);
+	assert(queue->head->next !=0);
+	TYPE front = listQueueFront(queue); //front is a temp value
+	struct Link* ptr = queue->head->next;
+	queue->head->next = ptr->next;
+	free(ptr);
+	return front;
 }
 
 /**
@@ -141,12 +166,19 @@ TYPE listQueueRemoveFront(struct Queue* queue)
 	param:	queue	struct Queue ptr
 	pre:	queue is not null
 	post:	none
-	ret:	1 if queue head next pointer is null (empty); 
+	ret:	1 if queue head next pointer is null (empty);
 			otherwise 0 (not null; not empty)
  */
-int listQueueIsEmpty(struct Queue* queue) 
+int listQueueIsEmpty(struct Queue* queue)
 {
 	/* FIXME: You will write this function */
+	assert(queue !=0);
+
+	if(queue->head->next==0)
+	{
+		return 1;
+	}
+	return 0;
 }
 
 /**
@@ -158,7 +190,7 @@ int listQueueIsEmpty(struct Queue* queue)
 			" " sentinel " "
 			" " queue " "
  */
-void listQueueDestroy(struct Queue* queue) 
+void listQueueDestroy(struct Queue* queue)
 {
 
         assert(queue != NULL);
@@ -172,7 +204,7 @@ void listQueueDestroy(struct Queue* queue)
 }
 
 /**
-	Allocates and initializes a stack that is comprised of two 
+	Allocates and initializes a stack that is comprised of two
 	instances of Queue data structures.
 	pre: 	none
 	post: 	memory allocated for new struct Stack ptr
@@ -180,10 +212,15 @@ void listQueueDestroy(struct Queue* queue)
 			stack q2 Queue instance init (call to queueCreate func)
 	return: stack
  */
-struct Stack* listStackFromQueuesCreate() 
+struct Stack* listStackFromQueuesCreate()
 {
 	 /* FIXME: You will write this function */
-
+	 struct Stack* ptr = malloc(sizeof(struct Stack));
+	 struct Queue * q1 = listQueueCreate();
+	 struct Queue * q2 = listQueueCreate();
+	 ptr->q1 = q1;
+	 ptr->q2 = q2;
+	 return ptr;
 };
 
 /**
@@ -192,9 +229,9 @@ struct Stack* listStackFromQueuesCreate()
 	param:	stack 	struct Stack ptr
 	pre: 	stack is not null
 	pre:	queues are not null
-	post: 	memory allocated to each link is freed along with the 
+	post: 	memory allocated to each link is freed along with the
 			two queues and stack themselves
-	
+
 	Note that I checked that q1 and q2 are not null in this function
 	also when I could have just left the assertion to fail in queueDestroy
 	if either were pointing to null, but I thought it best to be explicit,
@@ -219,8 +256,9 @@ void listStackDestroy(struct Stack* stack)
  */
 int listStackIsEmpty(struct Stack* stack)
 {
-	
 	/* FIXME: You will write this function */
+	assert(stack!=0);
+	return listQueueIsEmpty(stack->q1);
 }
 
 /**
@@ -234,12 +272,16 @@ int listStackIsEmpty(struct Stack* stack)
 void listSwapStackQueues(struct Stack* stack)
 {
 	/* FIXME: You will write this function */
+	assert(stack !=0);
+	struct Queue* ptr = stack->q1;
+	stack->q1 = stack->q2;
+	stack->q2 = ptr;
 
 }
 
 /**
 	Adds a new link with the given value to the back of the Queue q2.
-	Then while Queue q1 isn't empty, the first link of the queue is 
+	Then while Queue q1 isn't empty, the first link of the queue is
 	dequeued/removed and added to the back of Queue q2, so that in
 	the end, Queue q2 has the new order to represent the stack properly
 	with the new value at the front of the queue.
@@ -251,9 +293,18 @@ void listSwapStackQueues(struct Stack* stack)
 			it's empty
 			q1 and q2 are swapped
  */
-void listStackPush(struct Stack* stack, TYPE value) 
+void listStackPush(struct Stack* stack, TYPE value)
 {
 	/* FIXME: You will write this function */
+	assert(stack !=0);
+	listQueueAddBack(stack->q2,value);
+		printf("Before listStackPush while loop\n");
+	while (!listQueueIsEmpty(stack->q1))
+	{
+		listQueueAddBack(stack->q2,listQueueRemoveFront(stack->q1));
+	}
+		printf("After listStackPush while loop\n");
+	listSwapStackQueues(stack);
 }
 
 /**
@@ -264,9 +315,12 @@ void listStackPush(struct Stack* stack, TYPE value)
 	post:	first link is removed and freed (call to removeLink)
 	ret:	value of the removed link
  */
-TYPE listStackPop(struct Stack* stack) 
+TYPE listStackPop(struct Stack* stack)
 {
 	/* FIXME: You will write this function */
+	assert(stack !=0);
+	assert(!listStackIsEmpty(stack));
+	return listQueueRemoveFront(stack->q1);
 }
 
 /**
@@ -275,18 +329,21 @@ TYPE listStackPop(struct Stack* stack)
 	pre:	stack is not null
 	pre:	stack is not empty
 	post:	none
-	ret:	first link's value 
+	ret:	first link's value
  */
-TYPE listStackTop(struct Stack* stack) 
+TYPE listStackTop(struct Stack* stack)
 {
 	/* FIXME: You will write this function */
+	assert(stack !=0);
+	assert(!listStackIsEmpty(stack));
+	return listQueueFront(stack->q1);
 }
 
 /**
 	Used for testing the stack from queue implementation.
  */
 
-void assertTrue(int pred, char* msg) 
+void assertTrue(int pred, char* msg)
 {
 	printf("%s: ", msg);
 	if(pred)
@@ -295,21 +352,24 @@ void assertTrue(int pred, char* msg)
 		printf("\tFAILED\n");
 }
 
-int main() 
+int main()
 {
 	struct Stack* s = listStackFromQueuesCreate();
 	assert(s);
-	printf("\n-------------------------------------------------\n"); 
+	printf("\n-------------------------------------------------\n");
 	printf("---- Testing stack from queue implementation ----\n");
-	printf("-------------------------------------------------\n"); 
+	printf("-------------------------------------------------\n");
 	printf("stack init...\n");
 	assertTrue(listStackIsEmpty(s) == 1, "stackIsEmpty == 1");
-	
+
 	printf("\npushing 4, 5, -300...\n");
 	listStackPush(s, 4);
+	printf("After Stackpush 4\n");
 	listStackPush(s, 5);
+		printf("After Stackpush 5\n");
 	listStackPush(s, -300);
-	
+		printf("After Stackpush -300\n");
+
 	assertTrue(listStackIsEmpty(s) == 0, "stackIsEmpty == 0");
 	assertTrue(listStackPop(s) == -300, "\npopping; val == -300");
 	assertTrue(listStackPop(s) == 5, "popping; val == 5");
@@ -329,4 +389,5 @@ int main()
 
 	return 0;
 }
+
 
