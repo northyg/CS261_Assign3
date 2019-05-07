@@ -158,6 +158,12 @@ TYPE listQueueRemoveFront(struct Queue* queue)
 	struct Link* ptr = queue->head->next;
 	queue->head->next = ptr->next;
 	free(ptr);
+
+	/* This updates the tail pointer to point at the sentinel again if the queue is empty*/
+	if(queue->head->next==0)
+	{
+		queue->tail=queue->head;
+	}
 	return front;
 }
 
@@ -298,12 +304,10 @@ void listStackPush(struct Stack* stack, TYPE value)
 	/* FIXME: You will write this function */
 	assert(stack !=0);
 	listQueueAddBack(stack->q2,value);
-		printf("Before listStackPush while loop\n");
 	while (!listQueueIsEmpty(stack->q1))
 	{
 		listQueueAddBack(stack->q2,listQueueRemoveFront(stack->q1));
 	}
-		printf("After listStackPush while loop\n");
 	listSwapStackQueues(stack);
 }
 
@@ -364,11 +368,8 @@ int main()
 
 	printf("\npushing 4, 5, -300...\n");
 	listStackPush(s, 4);
-	printf("After Stackpush 4\n");
 	listStackPush(s, 5);
-		printf("After Stackpush 5\n");
 	listStackPush(s, -300);
-		printf("After Stackpush -300\n");
 
 	assertTrue(listStackIsEmpty(s) == 0, "stackIsEmpty == 0");
 	assertTrue(listStackPop(s) == -300, "\npopping; val == -300");
@@ -389,5 +390,3 @@ int main()
 
 	return 0;
 }
-
-
